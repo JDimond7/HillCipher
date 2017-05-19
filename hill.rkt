@@ -86,16 +86,16 @@
   (send plain-entry insert (apply-cipher (string-normalize-spaces (send encrypted-entry get-text))
                                          (make-inverse-key (read (open-input-string (send key-entry get-value)))))))
 
-(define key-entry (new text-field% [label " Key: "]
-                       [parent window]
-                       [init-value "((321 123 212) (242 412 187) (112 197 216))"])) ;hardcode in a default key. 
-
 ;;Window, text areas and buttons
 (define window (new frame%
                     [label "Hill Cipher"]
                     [width 600]
                     [height 400]))
-
+                    
+(define key-entry (new text-field% [label " Key: "]
+                       [parent window]
+                       [init-value "((321 123 212) (242 412 187) (112 197 216))"])) ;hardcode in a default key. 
+                       
 (define plain-entry (new text% [auto-wrap #t]))
 
 (define encrypted-entry (new text% [auto-wrap #t]))
