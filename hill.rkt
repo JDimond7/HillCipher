@@ -53,7 +53,7 @@
   (apply-cipher-aux (string-append msg correction) "" key))
 
 (define (make-inverse-key key)
-  (define key-matrix (build-matrix (length key) (length key) (λ (m n) (list-ref (list-ref key m) n))))
+  (define key-matrix (list*->matrix key))
   (define key-det (matrix-determinant key-matrix))
   (define inv-key (matrix-map (λ (x) (modulo x (hash-count alpha->num)))
                               (matrix-map (λ (x) (* x (* key-det (modular-inverse key-det (hash-count alpha->num)))))
@@ -61,7 +61,7 @@
   (matrix->list* inv-key))
 
 (define (check-key key)
-  (define key-matrix (build-matrix (length key) (length key) (λ (m n) (list-ref (list-ref key m) n))))
+  (define key-matrix (list*->matrix key))
   (define key-det (matrix-determinant key-matrix))
   (cond
     [(zero? key-det) #f]
@@ -70,7 +70,13 @@
 
 ;############ Build GUI.############
 
-;;Callbacks
+;;Main window.
+(define window (new frame%
+                    [label "Hill Cipher"]
+                    [width 600]
+                    [height 400]))
+                    
+;;Callbacks.
 (define (set-key-button-callback button event)
   (if (check-key (read (open-input-string (send key-entry get-value))))
       (message-box "Key Check" "Key OK ")
@@ -86,12 +92,7 @@
   (send plain-entry insert (apply-cipher (string-normalize-spaces (send encrypted-entry get-text))
                                          (make-inverse-key (read (open-input-string (send key-entry get-value)))))))
 
-;;Window, text areas and buttons
-(define window (new frame%
-                    [label "Hill Cipher"]
-                    [width 600]
-                    [height 400]))
-                    
+;;Text areas and buttons.                    
 (define key-entry (new text-field% [label " Key: "]
                        [parent window]
                        [init-value "((321 123 212) (242 412 187) (112 197 216))"])) ;hardcode in a default key. 
@@ -125,7 +126,7 @@
                               [parent button-panel]
                               [callback set-key-button-callback]))
 
-;;Default values in text areas
+;;Default values in text areas.
 (send plain-entry insert "Enter plain text here...")
 (send encrypted-entry insert "Or enter cipher text here...")
 
